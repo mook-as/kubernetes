@@ -224,9 +224,12 @@ func TestEventf(t *testing.T) {
 					t.Errorf("Event Name = %s; not a valid name: %v", actualEvent.Name, errs)
 				} // Overwrite fields that are not relevant for comparison
 				tc.expectedEvent.EventTime = actualEvent.EventTime
-				// invalid event names generate random names
 				if tc.expectedEvent.Name == "" {
+					// invalid event names generate random names
 					actualEvent.Name = ""
+				} else if strings.HasPrefix(actualEvent.Name, tc.expectedEvent.Name) {
+					// generated event names have a random suffix
+					actualEvent.Name = tc.expectedEvent.Name
 				}
 				if diff := cmp.Diff(tc.expectedEvent, actualEvent); diff != "" {
 					t.Errorf("Unexpected event diff (-want, +got):\n%s", diff)

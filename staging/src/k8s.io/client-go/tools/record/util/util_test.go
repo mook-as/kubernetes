@@ -56,16 +56,20 @@ func TestGenerateEventName(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			actual := GenerateEventName(tc.refName, timestamp)
+			duplicate := GenerateEventName(tc.refName, timestamp)
 
 			if errs := apimachineryvalidation.NameIsDNSSubdomain(actual, false); len(errs) > 0 {
 				t.Errorf("generateEventName(%s) = %s; not a valid name: %v", tc.refName, actual, errs)
 
 			}
 
-			if tc.expected != "" && (actual != tc.expected) {
-				t.Errorf("generateEventName(%s) returned %s expected %s", tc.refName, actual, tc.expected)
+			if tc.expected != "" && !strings.HasPrefix(actual, tc.expected) {
+				t.Errorf("generateEventName(%s) returned %s expected prefix %s", tc.refName, actual, tc.expected)
 			}
 
+			if actual == duplicate {
+				t.Errorf("generateEventName(%s) returned same name %s twice", tc.refName, actual)
+			}
 		})
 
 	}
